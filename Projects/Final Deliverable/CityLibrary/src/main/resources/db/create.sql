@@ -1,0 +1,141 @@
+CREATE DATABASE `city_library`;
+
+CREATE TABLE `Admin` (
+  `id` int(11) NOT NULL,
+  `loginId` varchar(45) NOT NULL,
+  `password` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `Author` (
+  `AUTHORID` varchar(255) NOT NULL,
+  `ANAME` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`AUTHORID`)
+) ;
+
+CREATE TABLE `Book` (
+  `DOCID` varchar(255) NOT NULL,
+  `ISBN` int(11) DEFAULT NULL,
+  PRIMARY KEY (`DOCID`),
+  CONSTRAINT `book_ibfk_1` FOREIGN KEY (`DOCID`) REFERENCES `document` (`DOCID`)
+) ;
+
+CREATE TABLE `Borrows` (
+  `BORNUMBER` int(11) NOT NULL AUTO_INCREMENT,
+  `READERID` varchar(255) DEFAULT NULL,
+  `DOCID` varchar(255) DEFAULT NULL,
+  `COPYNO` int(11) DEFAULT NULL,
+  `LIBID` varchar(255) DEFAULT NULL,
+  `BDTIME` datetime DEFAULT NULL,
+  `RDTIME` datetime DEFAULT NULL,
+  PRIMARY KEY (`BORNUMBER`),
+  KEY `DOCID` (`DOCID`,`COPYNO`,`LIBID`),
+  KEY `READERID` (`READERID`),
+  CONSTRAINT `borrows_ibfk_1` FOREIGN KEY (`DOCID`, `COPYNO`, `LIBID`) REFERENCES `copy` (`DOCID`, `COPYNO`, `LIBID`),
+  CONSTRAINT `borrows_ibfk_2` FOREIGN KEY (`READERID`) REFERENCES `reader` (`READERID`)
+) ENGINE=InnoDB AUTO_INCREMENT=45;
+
+CREATE TABLE `Branch` (
+  `LIBID` varchar(255) NOT NULL,
+  `LNAME` varchar(255) DEFAULT NULL,
+  `LLOCATION` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`LIBID`)
+) ;
+
+CREATE TABLE `Chief_Editor` (
+  `EDITORID` varchar(255) NOT NULL,
+  `ENAME` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`EDITORID`)
+) ;
+
+CREATE TABLE `Copy` (
+  `DOCID` varchar(255) NOT NULL,
+  `COPYNO` int(11) NOT NULL,
+  `LIBID` varchar(255) NOT NULL,
+  `POSITION` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`DOCID`,`COPYNO`,`LIBID`),
+  KEY `LIBID` (`LIBID`),
+  CONSTRAINT `copy_ibfk_1` FOREIGN KEY (`DOCID`) REFERENCES `document` (`DOCID`),
+  CONSTRAINT `copy_ibfk_2` FOREIGN KEY (`LIBID`) REFERENCES `branch` (`LIBID`)
+) ;
+
+CREATE TABLE `Document` (
+  `DOCID` varchar(255) NOT NULL,
+  `TITLE` varchar(255) DEFAULT NULL,
+  `PDATE` date DEFAULT NULL,
+  `PUBLISHERID` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`DOCID`),
+  KEY `PUBLISHERID` (`PUBLISHERID`),
+  CONSTRAINT `document_ibfk_1` FOREIGN KEY (`PUBLISHERID`) REFERENCES `publisher` (`PUBLISHERID`)
+) ;
+
+CREATE TABLE `Inv_Editor` (
+  `DOCID` varchar(255) NOT NULL,
+  `ISSUENO` int(11) NOT NULL,
+  `IENAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`DOCID`,`ISSUENO`,`IENAME`),
+  CONSTRAINT `inv_editor_ibfk_1` FOREIGN KEY (`DOCID`, `ISSUENO`) REFERENCES `journal_issue` (`DOCID`, `ISSUENO`)
+) ;
+
+CREATE TABLE `Journal_Issue` (
+  `DOCID` varchar(255) NOT NULL,
+  `ISSUENO` int(11) NOT NULL,
+  `SCOPE` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`DOCID`,`ISSUENO`),
+  CONSTRAINT `journal_issue_ibfk_1` FOREIGN KEY (`DOCID`) REFERENCES `journal_volume` (`DOCID`)
+) ;
+
+CREATE TABLE `Journal_Volume` (
+  `DOCID` varchar(255) NOT NULL,
+  `JVOLUME` int(11) DEFAULT NULL,
+  `EDITORID` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`DOCID`),
+  KEY `EDITORID` (`EDITORID`),
+  CONSTRAINT `journal_volume_ibfk_1` FOREIGN KEY (`EDITORID`) REFERENCES `chief_editor` (`EDITORID`),
+  CONSTRAINT `journal_volume_ibfk_2` FOREIGN KEY (`DOCID`) REFERENCES `document` (`DOCID`)
+) ;
+
+CREATE TABLE `Proceedings` (
+  `DOCID` varchar(255) NOT NULL,
+  `CDATE` date DEFAULT NULL,
+  `CLOCATION` varchar(255) DEFAULT NULL,
+  `CEDITOR` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`DOCID`),
+  CONSTRAINT `proceedings_ibfk_1` FOREIGN KEY (`DOCID`) REFERENCES `document` (`DOCID`)
+) ;
+
+CREATE TABLE `Publisher` (
+  `PUBLISHERID` varchar(255) NOT NULL,
+  `PUBNAME` varchar(255) DEFAULT NULL,
+  `ADDRESS` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`PUBLISHERID`)
+) ;
+
+CREATE TABLE `Reader` (
+  `READERID` varchar(255) NOT NULL,
+  `RTYPE` varchar(255) DEFAULT NULL,
+  `RNAME` varchar(255) DEFAULT NULL,
+  `ADDRESS` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`READERID`)
+) ;
+
+CREATE TABLE `Reserves` (
+  `RESNUMBER` int(11) NOT NULL AUTO_INCREMENT,
+  `READERID` varchar(255) DEFAULT NULL,
+  `DOCID` varchar(255) DEFAULT NULL,
+  `COPYNO` int(11) DEFAULT NULL,
+  `LIBID` varchar(255) DEFAULT NULL,
+  `DTIME` datetime DEFAULT NULL,
+  PRIMARY KEY (`RESNUMBER`),
+  KEY `DOCID` (`DOCID`,`COPYNO`,`LIBID`),
+  CONSTRAINT `reserves_ibfk_1` FOREIGN KEY (`DOCID`, `COPYNO`, `LIBID`) REFERENCES `copy` (`DOCID`, `COPYNO`, `LIBID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4;
+
+CREATE TABLE `Writes` (
+  `AUTHORID` varchar(255) NOT NULL,
+  `DOCID` varchar(255) NOT NULL,
+  PRIMARY KEY (`DOCID`,`AUTHORID`),
+  KEY `AUTHORID` (`AUTHORID`),
+  CONSTRAINT `writes_ibfk_1` FOREIGN KEY (`DOCID`) REFERENCES `book` (`DOCID`),
+  CONSTRAINT `writes_ibfk_2` FOREIGN KEY (`AUTHORID`) REFERENCES `author` (`AUTHORID`)
+) ;
